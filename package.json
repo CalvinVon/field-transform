@@ -9,7 +9,8 @@
     "build": "npm run build:es && npm run build:lib && npm run build:dist",
     "build:es": "tsc -p tsconfig.json",
     "build:lib": "rollup --config rollup.config.lib.js",
-    "build:dist": "rollup --config rollup.config.dist.js"
+    "build:dist": "rollup --config rollup.config.dist.js",
+    "test": "jest"
   },
   "keywords": [
     "field",

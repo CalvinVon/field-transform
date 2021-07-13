@@ -179,7 +179,7 @@ function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, gett
 }
 
 
-function transformer<T extends PlainObject | any[]>(source: T, mappers: TransformMapper[]): any {
+function transform<T extends PlainObject | any[]>(source: T, mappers: TransformMapper[]): any {
   try {
     mappers.forEach(mapper => {
       const { source: s, target: t } = mapper;
@@ -196,7 +196,7 @@ function transformer<T extends PlainObject | any[]>(source: T, mappers: Transfor
 }
 
 export {
-  transformer,
+  transform,
   fieldReader,
   fieldGetter,
   fieldSetter
