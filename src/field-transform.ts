@@ -147,17 +147,16 @@ function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, gett
           item.parent[field] = {};
         }
       }
-
+    },
+    leaveEachField({ parent, path, data }, { field, isLastField, isArray }) {
       // Checking exist value type
       if (
-        isArray && !Array.isArray(item.data)
-        || !isArray && typeof (item.data) !== 'object'
+        isArray && !Array.isArray(data)
+        || !isArray && typeof (data) !== 'object'
       ) {
         throw new TypeError(`Error found while setting fields: incorrect value type of the target field '${field}'.`);
       }
 
-    },
-    leaveEachField({ parent, path }, { field, isLastField }) {
       if (isLastField) {
         if (getterResult.length === 1) {
           // normal object replace

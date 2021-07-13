@@ -1,23 +1,31 @@
-import path from 'path';
 import resolve from '@rollup/plugin-node-resolve';
 import ts from '@rollup/plugin-typescript';
+import packageJson from './package.json';
 
-const getPath = _path => path.resolve(__dirname, _path);
-
-export default {
-    input: getPath('./src/index.ts'),
+/**
+ * @type {import('rollup').RollupOptions}
+ */
+const config = {
+    input: './src/index.ts',
     output: {
-        dir: getPath('./lib'),
+        file: packageJson.main,
         format: 'cjs',
+        name: 'fieldTransform',
         exports: 'named',
     },
     plugins: [
         ts({
             tsconfig: './tsconfig.json',
-            outDir: './lib'
+            outDir: '',
+            noEmit: true,
+            declaration: false,
+            declarationMap: false,
+            composite: false
         }),
         resolve({
             extensions: ['.ts']
         }),
     ]
 }
+
+export default config;

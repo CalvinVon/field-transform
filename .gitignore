@@ -1,4 +1,6 @@
 node_modules/
 .rollup.cache/
 es/
+dist/
+lib/
 tsconfig.tsbuildinfo
