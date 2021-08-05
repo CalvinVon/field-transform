@@ -1,43 +1,6 @@
 
 import transform from "../src";
 
-// const source = {
-//   prop: 'prop',
-//   data: {
-//     a: 'data-a',
-//     // b: null
-//     b: {
-//       c: 'data-C',
-//       other: 'origin'
-//     }
-//   },
-//   newData: {
-//     newB: {
-//       origin: 1
-//     }
-//   }
-// };
-
-// const listSource = {
-//   list: [
-//     {
-//       name: 'item-1',
-//       value: [
-//         { num: 111 },
-//         { num: 112 },
-//       ]
-//     },
-//     {
-//       name: 'item-2',
-//       value: [
-//         { num: 222 },
-//         { num: 223 }
-//       ]
-//     },
-//   ],
-//   // newList: {}
-// }
-
 let source: any;
 beforeEach(() => {
   source = {
@@ -59,7 +22,7 @@ test('transform top level field case', () => {
   expect(source.newA).toBe('fieldA');
 });
 
-test('transform high levels field case', () => {
+test('transform deep levels field case', () => {
   transform(source, [
     { source: 'b.c', target: 'newB.newC' },
     { source: 'a', target: 'b.newField' },
@@ -86,12 +49,23 @@ test('transform high levels field case', () => {
 
 
 test('transform to exist field', () => {
-  const spy = jest.spyOn(global.console, 'error');
   transform(source, [
     { source: 'a', target: 'arr' },
   ]);
 
-  console.log(source);
+  expect('a' in source).toBe(false);
+  expect(source.arr).toBe('fieldA');
+});
 
-  expect(spy).toBeCalled();
+
+test('transform not exist field to any field', () => {
+  transform(source, [
+    { source: 'not-exist', target: 'a' },
+    { source: 'not-exist', target: 'any' },
+  ]);
+
+  expect('not-exist' in source).toBe(false);
+  expect('a' in source).toBe(true);
+  expect(source.a).toBe(undefined);
+  expect('any' in source).toBe(true);
 });

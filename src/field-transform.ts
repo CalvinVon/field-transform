@@ -1,6 +1,11 @@
-import type { MatchResult, PlainObject, ReadInvolver, FieldReaderResult, TransformMapper } from "./types";
+import type { MatchResult, PlainObject, ReadInvolver, FieldReaderResult, TransformMapper, TransformConfig } from "./types";
 
 const noop = () => null;
+const defaultConfig: TransformConfig = {
+  strict: false,
+  checkType: false,
+  delete: true
+};
 
 function tryMatchArrayGramma(field: string): MatchResult {
   const result: MatchResult = {
@@ -43,7 +48,6 @@ function fieldReader<T extends PlainObject | any[]>(data: T, field: string, invo
           if (!field && Array.isArray(it.data)) {
             // when root data is `Array` type
             it.data = data || [];
-            // it.parent
           }
           else {
             it.path.push(field);
@@ -54,7 +58,6 @@ function fieldReader<T extends PlainObject | any[]>(data: T, field: string, invo
               isLastField,
               isArray: matchRst.isArray
             };
-            // it.parent = it.data || [];
             it.parent = it.data;
             it.data = it.parent[field];
             const params = [it, ctx] as const;
@@ -105,18 +108,24 @@ function fieldReader<T extends PlainObject | any[]>(data: T, field: string, invo
  * 
  * A `fieldReader` wrapper
  */
-function fieldGetter<T extends PlainObject | any[]>(data: T, field: string): Array<FieldReaderResult<T>> {
+function fieldGetter<T extends PlainObject | any[]>(data: T, field: string, config?: TransformConfig): Array<FieldReaderResult<T>> {
+  const { delete: deleteKey } = { ...defaultConfig, ...config };
   return fieldReader(data, field, {
-    enterEachField(item, { field, isArray }) {
-      if (!item.parent) {
-        item.parent = isArray ? [] : {};
-      }
+    enterEachField(item, { field, isArray, isLastField }) {
+      // if (!item.parent) {
+      //   item.parent = isArray ? [] : {};
+      // }
       if (!item.data) {
-        item.parent[field] = isArray ? [] : {};
+        if (isLastField) {
+          item.parent[field] = undefined;
+        }
+        else {
+          item.parent[field] = isArray ? [] : {};
+        }
       }
     },
     leaveEachField({ parent }, { field, isLastField }) {
-      if (isLastField) {
+      if (deleteKey && isLastField) {
         delete parent[field];
       }
     }
@@ -129,12 +138,40 @@ function fieldGetter<T extends PlainObject | any[]>(data: T, field: string): Arr
  * 
  * A `fieldReader` wrapper
  */
-function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, getterResult: FieldReaderResult<T>[]): Array<FieldReaderResult<T>> {
+function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, getterResult: FieldReaderResult<T>[], config?: TransformConfig): Array<FieldReaderResult<T>> {
+  let {
+    checkType,
+    strict
+  } = { ...defaultConfig, ...config };
+
+  if (strict) {
+    checkType = true;
+  }
+
+  /** Check exist value type */
+  const checkExistValueType = (source: any, target: any) => {
+    if (checkType) {
+      const getType = Object.prototype.toString;
+      const sType = getType.call(source);
+      const tType = getType.call(target);
+
+      if (sType !== tType && tType !== '[object Undefined]') {
+        throw new TypeError(
+          `Error found while setting fields: incorrect value type of the target field '${field}'. Expecting type is ${sType}, actual type is ${tType}`
+        );
+      }
+    }
+  };
+
   return fieldReader(data, field, {
-    enterEachField(item, { field, isArray }) {
+    enterEachField(item, { field, isArray, isLastField }) {
 
       // Padding empty value/field
       if (!item.data) {
+        if (isLastField) {
+          item.parent[field] = undefined;
+          return;
+        }
         if (isArray) {
           item.parent[field] = getterResult
             .map((_, index) => {
@@ -152,34 +189,33 @@ function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, gett
       // Checking exist value type
       if (
         isArray && !Array.isArray(data)
-        || !isArray && typeof (data) !== 'object'
+        || !isArray && (!isLastField && (typeof (data) !== 'object'))
       ) {
         throw new TypeError(`Error found while setting fields: incorrect value type of the target field '${field}'.`);
       }
 
       if (isLastField) {
-        if (getterResult.length === 1) {
-          // normal object replace
-          parent[field] = getterResult[0].data;
-        }
-        else {
-          const valueItem = getterResult.find(it => {
-            return it.path.every((p, pIdx) => {
-              if (p.match(/^\d+$/)) {
-                return p === path[pIdx];
-              }
-              return true;
-            })
-          });
-          parent[field] = valueItem?.data;
-        }
+        const valueItem = getterResult.find(it => {
+          return it.path.every((p, pIdx) => {
+            if (p.match(/^\d+$/)) {
+              return p === path[pIdx];
+            }
+            return true;
+          })
+        });
+
+        const source = valueItem?.data;
+        const target = parent[field];
+        checkExistValueType(source, target);
+        parent[field] = source;
       }
     }
   })
 }
 
 
-function transform<T extends PlainObject | any[]>(source: T, mappers: TransformMapper[]): any {
+function transform<T extends PlainObject | any[]>(source: T, mappers: TransformMapper[], config?: TransformConfig) {
+  const { strict } = { ...defaultConfig, ...config };
   try {
     mappers.forEach(mapper => {
       const { source: s, target: t } = mapper;
@@ -187,11 +223,14 @@ function transform<T extends PlainObject | any[]>(source: T, mappers: TransformM
         throw new Error('Error found while parsing template gramma: `source` and `target` should have same array level.');
       }
 
-      const getterResult = fieldGetter(source, s);
-      fieldSetter(source, t, getterResult);
+      const getterResult = fieldGetter(source, s, config);
+      fieldSetter(source, t, getterResult, config);
     });
   } catch (error) {
-    console.error(error);
+    if (strict) {
+      throw error;
+    }
+    console.warn(error);
   }
 }
 

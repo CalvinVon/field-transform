@@ -26,3 +26,12 @@ export type ReadInvolverContext = {
   isArray: boolean;
   isLastField: boolean;
 }
+
+export type TransformConfig = {
+  /** Enable strict mode */
+  strict?: boolean;
+  /** Should check value when setting value */
+  checkType?: boolean;
+  /** Should the delete original attribute value */
+  delete?: boolean;
+}
