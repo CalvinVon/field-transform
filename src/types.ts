@@ -9,14 +9,14 @@ export type MatchResult = {
   arrayField: string;
 };
 
-export type FieldReaderResult<T> = {
+export type FieldReaderResult<T = any> = {
   field: string;
   path: string[];
   data: T;
   parent: any;
 };
 
-export type ReadInvolver<T> = {
+export type ReadInvolver<T = any> = {
   enterEachField?: (item: FieldReaderResult<T>, context: ReadInvolverContext) => void;
   leaveEachField?: (item: FieldReaderResult<T>, context: ReadInvolverContext) => void;
 }
@@ -32,6 +32,9 @@ export type TransformConfig = {
   strict?: boolean;
   /** Should check value when setting value */
   checkType?: boolean;
-  /** Should the delete original attribute value */
+  /**
+   * Should the delete original attribute value
+   * @default true
+   * */
   delete?: boolean;
 }

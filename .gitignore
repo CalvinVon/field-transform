@@ -4,3 +4,4 @@ es/
 dist/
 lib/
 tsconfig.tsbuildinfo
+coverage/

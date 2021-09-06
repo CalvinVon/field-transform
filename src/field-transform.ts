@@ -31,13 +31,13 @@ function tryMatchArrayGramma(field: string): MatchResult {
  * @param involver.enterEachField whether delete field key after read. Default `true`
  * @param involver.leaveEachField whether delete field key after read. Default `true`
 */
-function fieldReader<T extends PlainObject | any[]>(data: T, field: string, involver?: ReadInvolver<T>): Array<FieldReaderResult<T>> {
+function fieldReader<T extends PlainObject | PlainObject[]>(data: T, field: string, involver?: ReadInvolver): Array<FieldReaderResult> {
   const {
     enterEachField = noop,
     leaveEachField = noop
   } = involver || {};
   const path = field.split('.');
-  let process: FieldReaderResult<T>[] = [{ field, path: [], data, parent: null }];
+  let process: FieldReaderResult[] = [{ field, path: [], data, parent: null }];
 
   path.forEach((f: string, idx: number) => {
     const matchRst = tryMatchArrayGramma(f);
@@ -99,7 +99,7 @@ function fieldReader<T extends PlainObject | any[]>(data: T, field: string, invo
 
   });
 
-  return process as Array<FieldReaderResult<T>>;
+  return process as Array<FieldReaderResult>;
 }
 
 
@@ -108,13 +108,10 @@ function fieldReader<T extends PlainObject | any[]>(data: T, field: string, invo
  * 
  * A `fieldReader` wrapper
  */
-function fieldGetter<T extends PlainObject | any[]>(data: T, field: string, config?: TransformConfig): Array<FieldReaderResult<T>> {
+function fieldGetter<T extends PlainObject | PlainObject[]>(data: T, field: string, config?: TransformConfig): Array<FieldReaderResult> {
   const { delete: deleteKey } = { ...defaultConfig, ...config };
   return fieldReader(data, field, {
     enterEachField(item, { field, isArray, isLastField }) {
-      // if (!item.parent) {
-      //   item.parent = isArray ? [] : {};
-      // }
       if (!item.data) {
         if (isLastField) {
           item.parent[field] = undefined;
@@ -138,7 +135,7 @@ function fieldGetter<T extends PlainObject | any[]>(data: T, field: string, conf
  * 
  * A `fieldReader` wrapper
  */
-function fieldSetter<T extends PlainObject | any[]>(data: T, field: string, getterResult: FieldReaderResult<T>[], config?: TransformConfig): Array<FieldReaderResult<T>> {
+function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: string, getterResult: FieldReaderResult[], config?: TransformConfig): Array<FieldReaderResult> {
   let {
     checkType,
     strict
