@@ -10,7 +10,8 @@
     "build:es": "tsc -p tsconfig.json",
     "build:lib": "rollup --config rollup.config.lib.js",
     "build:dist": "rollup --config rollup.config.dist.js",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [
     "field",

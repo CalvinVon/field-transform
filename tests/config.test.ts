@@ -15,31 +15,31 @@ describe('test `checkType` flag', () => {
   test('transform number to object', () => {
 
     transform(source, [
-      { source: 'num', target: 'obj' },
+      { src: 'num', dest: 'obj' },
     ], { checkType: true });
 
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the target field 'obj'. Expecting type is [object Number], actual type is [object Object]`));
+    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the dest field 'obj'. Expecting type is [object Number], actual type is [object Object]`));
   });
 
   test('transform number to array', () => {
 
     transform(source, [
-      { source: 'num', target: 'arr' },
+      { src: 'num', dest: 'arr' },
     ], { checkType: true });
 
     expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the target field 'arr'. Expecting type is [object Number], actual type is [object Array]`));
+    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the dest field 'arr'. Expecting type is [object Number], actual type is [object Array]`));
   });
 
   test('transform array to object', () => {
 
     transform(source, [
-      { source: 'arr', target: 'obj' },
+      { src: 'arr', dest: 'obj' },
     ], { checkType: true });
 
     expect(spy).toHaveBeenCalledTimes(3);
-    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the target field 'obj'. Expecting type is [object Array], actual type is [object Object]`));
+    expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the dest field 'obj'. Expecting type is [object Array], actual type is [object Object]`));
   });
 
 });
@@ -55,8 +55,8 @@ describe('test `strict` flag', () => {
     };
     expect(() => {
       transform(source, [
-        { source: 'num', target: 'obj' },
+        { src: 'num', dest: 'obj' },
       ], { strict: true });
-    }).toThrowError(`Error found while setting fields: incorrect value type of the target field 'obj'. Expecting type is [object Number], actual type is [object Object]`);
+    }).toThrowError(`Error found while setting fields: incorrect value type of the dest field 'obj'. Expecting type is [object Number], actual type is [object Object]`);
   });
 });

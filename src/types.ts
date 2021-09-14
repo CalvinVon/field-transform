@@ -1,7 +1,7 @@
 export type PlainObject = Record<string, any>;
 export type TransformMapper = {
-  source: string;
-  target: string;
+  src: string;
+  dest: string;
 };
 
 export type MatchResult = {

@@ -154,7 +154,7 @@ function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: stri
 
       if (sType !== tType && tType !== '[object Undefined]') {
         throw new TypeError(
-          `Error found while setting fields: incorrect value type of the target field '${field}'. Expecting type is ${sType}, actual type is ${tType}`
+          `Error found while setting fields: incorrect value type of the dest field '${field}'. Expecting type is ${sType}, actual type is ${tType}`
         );
       }
     }
@@ -188,7 +188,7 @@ function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: stri
         isArray && !Array.isArray(data)
         || !isArray && (!isLastField && (typeof (data) !== 'object'))
       ) {
-        throw new TypeError(`Error found while setting fields: incorrect value type of the target field '${field}'.`);
+        throw new TypeError(`Error found while setting fields: incorrect value type of the dest field '${field}'.`);
       }
 
       if (isLastField) {
@@ -215,9 +215,9 @@ function transform<T extends PlainObject | any[]>(source: T, mappers: TransformM
   const { strict } = { ...defaultConfig, ...config };
   try {
     mappers.forEach(mapper => {
-      const { source: s, target: t } = mapper;
+      const { src: s, dest: t } = mapper;
       if (s.match(/\[\]/g)?.length !== t.match(/\[\]/g)?.length) {
-        throw new Error('Error found while parsing template gramma: `source` and `target` should have same array level.');
+        throw new Error('Error found while parsing template gramma: `src` and `dest` should have same array level.');
       }
 
       const getterResult = fieldGetter(source, s, config);

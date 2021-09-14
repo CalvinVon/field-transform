@@ -16,7 +16,7 @@ beforeEach(() => {
 })
 
 test('transform top level field case', () => {
-  transform(source, [{ source: 'a', target: 'newA' }]);
+  transform(source, [{ src: 'a', dest: 'newA' }]);
   expect('a' in source).toBe(false);
   expect('newA' in source).toBe(true);
   expect(source.newA).toBe('fieldA');
@@ -24,9 +24,9 @@ test('transform top level field case', () => {
 
 test('transform deep levels field case', () => {
   transform(source, [
-    { source: 'b.c', target: 'newB.newC' },
-    { source: 'a', target: 'b.newField' },
-    { source: 'b.d.e', target: 'newB.newD.newE' },
+    { src: 'b.c', dest: 'newB.newC' },
+    { src: 'a', dest: 'b.newField' },
+    { src: 'b.d.e', dest: 'newB.newD.newE' },
   ]);
   expect('b' in source).toBe(true);
   expect('c' in source?.b).toBe(false);
@@ -50,7 +50,7 @@ test('transform deep levels field case', () => {
 
 test('transform to exist field', () => {
   transform(source, [
-    { source: 'a', target: 'arr' },
+    { src: 'a', dest: 'arr' },
   ]);
 
   expect('a' in source).toBe(false);
@@ -60,8 +60,8 @@ test('transform to exist field', () => {
 
 test('transform not exist field to any field', () => {
   transform(source, [
-    { source: 'not-exist', target: 'a' },
-    { source: 'not-exist', target: 'any' },
+    { src: 'not-exist', dest: 'a' },
+    { src: 'not-exist', dest: 'any' },
   ]);
 
   expect('not-exist' in source).toBe(false);

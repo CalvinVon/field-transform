@@ -39,8 +39,8 @@ test('transform whole array value', () => {
   const originList = listSource.list.map((it) => it.name);
   const originNumList = listSource.list.reduce((total: any[], cur) => [...total, cur.value.map(it => it.num)], []);
   transform(listSource, [
-    { source: 'list[].name', target: 'newList[].label' },
-    { source: 'list[].value[].num', target: 'newList[].newValue[].newNum' },
+    { src: 'list[].name', dest: 'newList[].label' },
+    { src: 'list[].value[].num', dest: 'newList[].newValue[].newNum' },
   ]);
 
   expect('list' in listSource).toBe(true);
@@ -72,7 +72,7 @@ test('transform whole array value', () => {
 test('transform array object gramma', () => {
   const originList = list.reduce((total: any[], cur) => [...total, (cur.a as any[])?.map(it => it.b) ?? []], []);
   transform(list, [
-    { source: '[].a[].b', target: '[].newA[].newB' }
+    { src: '[].a[].b', dest: '[].newA[].newB' }
   ]);
 
   list.forEach((item, index) => {
@@ -94,8 +94,8 @@ test('transform array object gramma', () => {
 test('access fields that not exist would not throw error', () => {
   expect(() => {
     transform(list, [
-      { source: '[].not.not', target: '[].is.is' },
-      { source: '[].notArr[].not', target: '[].isArr[].is' },
+      { src: '[].not.not', dest: '[].is.is' },
+      { src: '[].notArr[].not', dest: '[].isArr[].is' },
     ]);
   }).not.toThrowError();
 });
@@ -104,19 +104,17 @@ test('access fields that not exist would not throw error', () => {
 test('transform incorrect array level should warning', () => {
   const spy = jest.spyOn(global.console, 'warn');
   transform(list, [
-    { source: '[].a', target: '[].a[].b' },
+    { src: '[].a', dest: '[].a[].b' },
   ]);
 
-  expect(spy).toHaveBeenLastCalledWith(new Error('Error found while parsing template gramma: `source` and `target` should have same array level.'));
+  expect(spy).toHaveBeenLastCalledWith(new Error('Error found while parsing template gramma: `src` and `dest` should have same array level.'));
 });
 
-test('transform target is not array mode should warning', () => {
+test('transform dest is not array mode should warning', () => {
   const spy = jest.spyOn(global.console, 'warn');
   transform(listSource, [
-    { source: 'list[].name', target: 'obj[]' },
+    { src: 'list[].name', dest: 'obj[]' },
   ]);
 
-  console.log(listSource)
-
-  expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the target field 'obj'.`));
+  expect(spy).toHaveBeenLastCalledWith(new TypeError(`Error found while setting fields: incorrect value type of the dest field 'obj'.`));
 });
