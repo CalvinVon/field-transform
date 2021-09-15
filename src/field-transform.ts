@@ -223,6 +223,8 @@ function transform<T extends PlainObject | any[]>(source: T, mappers: TransformM
       const getterResult = fieldGetter(source, s, config);
       fieldSetter(source, t, getterResult, config);
     });
+
+    return source as T extends PlainObject ? PlainObject : any[];
   } catch (error) {
     if (strict) {
       throw error;

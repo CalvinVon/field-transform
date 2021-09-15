@@ -18,7 +18,7 @@ const config = {
             tsconfig: './tsconfig.json',
             outDir: '',
             noEmit: true,
-            declaration: false,
+            declaration: true,
             declarationMap: false,
             composite: false
         }),
