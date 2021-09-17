@@ -23,7 +23,10 @@ export type ReadInvolver<T = any> = {
 export type ReadInvolverContext = {
   field: string;
   fieldParseIndex: number;
-  isArray: boolean;
+  /** current field is parsed from `[]` */
+  fieldIsArray: boolean;
+  /** parse mode is array */
+  isArrayMode: boolean;
   isLastField: boolean;
 }
 

@@ -36,10 +36,12 @@ function fieldReader<T extends PlainObject | PlainObject[]>(data: T, field: stri
     enterEachField = noop,
     leaveEachField = noop
   } = involver || {};
-  const path = field.split('.');
+
+  const paths = field.split('.');
+  const isArrayMode = paths.some(path => tryMatchArrayGramma(path).isArray);
   let process: FieldReaderResult[] = [{ field, path: [], data, parent: null }];
 
-  path.forEach((f: string, idx: number) => {
+  paths.forEach((f: string, idx: number) => {
     const matchRst = tryMatchArrayGramma(f);
     if (matchRst.isArray) {
       process = process
@@ -51,12 +53,13 @@ function fieldReader<T extends PlainObject | PlainObject[]>(data: T, field: stri
           }
           else {
             it.path.push(field);
-            const isLastField = idx === path.length - 1;
+            const isLastField = idx === paths.length - 1;
             const ctx = {
               field,
               fieldParseIndex: idx,
               isLastField,
-              isArray: matchRst.isArray
+              fieldIsArray: matchRst.isArray,
+              isArrayMode
             };
             it.parent = it.data;
             it.data = it.parent[field];
@@ -78,12 +81,13 @@ function fieldReader<T extends PlainObject | PlainObject[]>(data: T, field: stri
     else {
       process = process.map(it => {
         it.path.push(f);
-        const isLastField = idx === path.length - 1;
+        const isLastField = idx === paths.length - 1;
         const ctx = {
           field: f,
           fieldParseIndex: idx,
           isLastField,
-          isArray: matchRst.isArray
+          fieldIsArray: matchRst.isArray,
+          isArrayMode
         };
 
         it.parent = it.data;
@@ -111,13 +115,13 @@ function fieldReader<T extends PlainObject | PlainObject[]>(data: T, field: stri
 function fieldGetter<T extends PlainObject | PlainObject[]>(data: T, field: string, config?: TransformConfig): Array<FieldReaderResult> {
   const { delete: deleteKey } = { ...defaultConfig, ...config };
   return fieldReader(data, field, {
-    enterEachField(item, { field, isArray, isLastField }) {
+    enterEachField(item, { field, fieldIsArray, isLastField }) {
       if (!item.data) {
         if (isLastField) {
           item.parent[field] = undefined;
         }
         else {
-          item.parent[field] = isArray ? [] : {};
+          item.parent[field] = fieldIsArray ? [] : {};
         }
       }
     },
@@ -161,7 +165,7 @@ function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: stri
   };
 
   return fieldReader(data, field, {
-    enterEachField(item, { field, isArray, isLastField }) {
+    enterEachField(item, { field, fieldIsArray, isLastField }) {
 
       // Padding empty value/field
       if (!item.data) {
@@ -169,7 +173,7 @@ function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: stri
           item.parent[field] = undefined;
           return;
         }
-        if (isArray) {
+        if (fieldIsArray) {
           item.parent[field] = getterResult
             .map((_, index) => {
               const foundItem = getterResult.find(it => +it.path[item.path.length] === index);
@@ -182,24 +186,30 @@ function fieldSetter<T extends PlainObject | PlainObject[]>(data: T, field: stri
         }
       }
     },
-    leaveEachField({ parent, path, data }, { field, isLastField, isArray }) {
+    leaveEachField({ parent, path, data }, { field, isLastField, fieldIsArray, isArrayMode }) {
       // Checking exist value type
       if (
-        isArray && !Array.isArray(data)
-        || !isArray && (!isLastField && (typeof (data) !== 'object'))
+        fieldIsArray && !Array.isArray(data)
+        || !fieldIsArray && (!isLastField && (typeof (data) !== 'object'))
       ) {
         throw new TypeError(`Error found while setting fields: incorrect value type of the dest field '${field}'.`);
       }
 
       if (isLastField) {
-        const valueItem = getterResult.find(it => {
-          return it.path.every((p, pIdx) => {
-            if (p.match(/^\d+$/)) {
-              return p === path[pIdx];
-            }
-            return true;
-          })
-        });
+        let valueItem;
+        if (!isArrayMode) {
+          valueItem = getterResult[0];
+        }
+        else {
+          valueItem = getterResult.find(it => {
+            return it.path.every((p, pIdx) => {
+              if (p.match(/^\d+$/)) {
+                return p === path[pIdx];
+              }
+              return true;
+            })
+          });
+        }
 
         const source = valueItem?.data;
         const target = parent[field];
