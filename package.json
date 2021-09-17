@@ -1,6 +1,6 @@
 {
   "name": "field-transform",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha.1",
   "description": "A javascript tool to manipulate JSON object by transforming fields.",
   "main": "./lib/index.js",
   "module": "./es/index.js",

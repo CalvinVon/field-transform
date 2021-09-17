@@ -1,0 +1,13 @@
+.vscode/
+.rollup.cache/
+coverage/
+.editorconfig
+
+rollup.config.**
+tsconfig.json
+tsconfig.tsbuildinfo
+jest.config.ts
+
+
+src/
+tests/
