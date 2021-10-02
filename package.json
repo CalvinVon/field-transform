@@ -1,10 +1,10 @@
 {
   "name": "field-transform",
   "version": "1.0.0-alpha.2",
-  "description": "A javascript tool to manipulate JSON object by transforming fields.",
+  "description": "A javascript tool to manipulate JS object by transforming fields.",
   "main": "./lib/index.js",
   "module": "./es/index.js",
-  "unpkg": "./dist/index.min.js",
+  "unpkg": "./dist/field-transform.min.js",
   "scripts": {
     "build": "npm run build:es && npm run build:lib && npm run build:dist",
     "build:es": "tsc -p tsconfig.json",
