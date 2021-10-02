@@ -3,10 +3,10 @@
 一个通过操作对象属性层级的 JS 对象字转换器
 
 [![version](https://img.shields.io/npm/v/field-transform.svg)](https://www.npmjs.com/package/field-transform)
-[![codecov](https://codecov.io/gh/CalvinVon/axios-api-module/branch/master/graph/badge.svg)](https://codecov.io/gh/CalvinVon/axios-api-module)
-[![](https://img.shields.io/npm/dt/field-transform.svg)](https://github.com/CalvinVon/axios-api-module)
+[![codecov](https://codecov.io/gh/CalvinVon/field-transform/branch/master/graph/badge.svg)](https://codecov.io/gh/CalvinVon/field-transform)
+[![](https://img.shields.io/npm/dt/field-transform.svg)](https://github.com/CalvinVon/field-transform)
 ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/min/field-transform)
-[![Build Status](https://travis-ci.org/CalvinVon/axios-api-module.svg?branch=master)](https://travis-ci.org/CalvinVon/axios-api-module)
+[![Build Status](https://travis-ci.org/CalvinVon/field-transform.svg?branch=master)](https://travis-ci.org/CalvinVon/field-transform)
 [![dependencies](https://img.shields.io/david/CalvinVon/field-transform.svg)](https://www.npmjs.com/package/field-transform)
 
 
